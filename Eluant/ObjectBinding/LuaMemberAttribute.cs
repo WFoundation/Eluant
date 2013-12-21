@@ -1,5 +1,5 @@
 //
-// LuaLightUserdata.cs
+// LuaMemberAttribute.cs
 //
 // Author:
 //       Chris Howie <me@chrishowie.com>
@@ -26,32 +26,18 @@
 
 using System;
 
-namespace Eluant
+namespace Eluant.ObjectBinding
 {
-    public class LuaLightUserdata : LuaReference
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Method | AttributeTargets.Property, AllowMultiple=true, Inherited=true)]
+    public class LuaMemberAttribute : Attribute
     {
-        internal LuaLightUserdata(LuaRuntime runtime, int reference) : base(runtime, reference) { }
+        public string LuaKey { get; private set; }
 
-        public override bool ToBoolean()
+        public LuaMemberAttribute() : this(null) { }
+
+        public LuaMemberAttribute(string luaKey)
         {
-            return true;
-        }
-
-        public override double? ToNumber()
-        {
-            return null;
-        }
-
-        public override string ToString()
-        {
-            return "[LuaLightUserdata]";
-        }
-
-        new public LuaWeakReference<LuaLightUserdata> CreateWeakReference()
-        {
-            CheckDisposed();
-
-            return Runtime.CreateWeakReference(this);
+            LuaKey = luaKey;
         }
     }
 }

@@ -1,5 +1,5 @@
 //
-// LuaLightUserdata.cs
+// MetamethodAttribute.cs
 //
 // Author:
 //       Chris Howie <me@chrishowie.com>
@@ -26,32 +26,17 @@
 
 using System;
 
-namespace Eluant
+namespace Eluant.ObjectBinding
 {
-    public class LuaLightUserdata : LuaReference
+    // This attribute is internal because it should not be added to any interfaces except those declared by Eluant.
+    [AttributeUsage(AttributeTargets.Interface, Inherited=false, AllowMultiple=true)]
+    internal class MetamethodAttribute : Attribute
     {
-        internal LuaLightUserdata(LuaRuntime runtime, int reference) : base(runtime, reference) { }
+        public string MethodName { get; private set; }
 
-        public override bool ToBoolean()
+        public MetamethodAttribute(string methodName)
         {
-            return true;
-        }
-
-        public override double? ToNumber()
-        {
-            return null;
-        }
-
-        public override string ToString()
-        {
-            return "[LuaLightUserdata]";
-        }
-
-        new public LuaWeakReference<LuaLightUserdata> CreateWeakReference()
-        {
-            CheckDisposed();
-
-            return Runtime.CreateWeakReference(this);
+            MethodName = methodName;
         }
     }
 }

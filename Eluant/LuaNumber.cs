@@ -28,6 +28,18 @@ using System;
 
 namespace Eluant
 {
+	#if USE_KOPILUA
+	using LuaApi = KopiLuaWrapper;
+	using LuaApi_CFunction = KopiLua.LuaNativeFunction;
+	using LuaApi_LuaType = LuaNative.LuaType;
+	using LuaApi_LuaState = KopiLua.LuaState;
+	#else
+	using LuaApi = LuaNative;
+	using LuaApi_CFunction = Eluant.LuaNative.lua_CFunction;
+	using LuaApi_LuaType = LuaNative.LuaType;
+	using LuaApi_LuaState = IntPtr;
+	#endif
+
     public sealed partial class LuaNumber : LuaValueType,
         IEquatable<LuaNumber>, IEquatable<double>,
         IComparable<LuaNumber>, IComparable<double>,
@@ -60,6 +72,17 @@ namespace Eluant
         public override string ToString()
         {
             return Value.ToString();
+        }
+
+        internal override object ToClrType(Type type)
+        {
+            if (type == null) { throw new ArgumentNullException("type"); }
+
+            try {
+                return Convert.ChangeType(Value, type);
+            } catch { }
+
+            return base.ToClrType(type);
         }
 
         private int hashCode;

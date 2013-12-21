@@ -1,5 +1,5 @@
 //
-// LuaGlobalsTable.cs
+// LuaClrObjectReference.cs
 //
 // Author:
 //       Chris Howie <me@chrishowie.com>
@@ -40,34 +40,72 @@ namespace Eluant
 	using LuaApi_LuaState = IntPtr;
 	#endif
 
-    public class LuaGlobalsTable : LuaTable
+    public sealed class LuaClrObjectReference : LuaUserdata, IClrObject
     {
-        internal LuaGlobalsTable(LuaRuntime runtime) : base(runtime, 0)
+        public LuaClrObjectReference(LuaRuntime runtime, int reference) : base(runtime, reference) { }
+
+        public override bool ToBoolean()
         {
-            // Finalization not required for this special reference.
-            GC.SuppressFinalize(this);
+            return ClrObject != null;
         }
 
-        internal override void Push(LuaRuntime runtime)
+        public override double? ToNumber()
         {
-            LuaApi.lua_pushvalue(runtime.LuaState, LuaApi.LUA_GLOBALSINDEX);
+            return null;
+        }
+
+        public override string ToString()
+        {
+            return string.Format("[LuaClrObjectReference ClrObject:{0}]", ClrObject);
         }
 
         protected override void Dispose(bool disposing)
         {
-            // Do nothing.
+            base.Dispose(disposing);
+
+            isClrObjectValueCached = false;
+            cachedClrObjectValue = null;
         }
 
-        protected override LuaValue CopyReferenceImpl()
+        private bool isClrObjectValueCached = false;
+        private LuaClrObjectValue cachedClrObjectValue = null;
+
+        public LuaClrObjectValue ClrObjectValue
         {
-            // This is a singleton per runtime, no need to copy anything.
-            return this;
+            get {
+                CheckDisposed();
+
+                if (!isClrObjectValueCached) {
+                    Runtime.Push(this);
+                    cachedClrObjectValue = Runtime.GetClrObject<LuaClrObjectValue>(-1);
+                    LuaApi.lua_pop(Runtime.LuaState, 1);
+
+                    isClrObjectValueCached = true;
+                }
+
+                return cachedClrObjectValue;
+            }
         }
 
-        public override bool Equals(LuaReference r)
+        public object ClrObject
         {
-            // This singleton table is only ever equal to itself.
-            return object.ReferenceEquals(r, this);
+            get { return ClrObjectValue.ClrObject; }
+        }
+
+        new public LuaWeakReference<LuaClrObjectReference> CreateWeakReference()
+        {
+            CheckDisposed();
+
+            return Runtime.CreateWeakReference(this);
+        }
+
+        internal override object ToClrType(Type type)
+        {
+            try {
+                return ClrObjectValue.ToClrType(type);
+            } catch (ArgumentException) { }
+
+            return base.ToClrType(type);
         }
     }
 }

@@ -1,5 +1,5 @@
 //
-// LuaLightUserdata.cs
+// LuaCustomClrObject.cs
 //
 // Author:
 //       Chris Howie <me@chrishowie.com>
@@ -28,30 +28,28 @@ using System;
 
 namespace Eluant
 {
-    public class LuaLightUserdata : LuaReference
+    public class LuaCustomClrObject : LuaClrObjectValue, IEquatable<LuaCustomClrObject>
     {
-        internal LuaLightUserdata(LuaRuntime runtime, int reference) : base(runtime, reference) { }
+        public LuaCustomClrObject(object obj) : base(obj) { }
 
-        public override bool ToBoolean()
+        internal override void Push(LuaRuntime runtime)
         {
-            return true;
+            runtime.PushCustomClrObject(this);
         }
 
-        public override double? ToNumber()
+        public override bool Equals(LuaValue other)
         {
-            return null;
+            return Equals(other as LuaCustomClrObject);
         }
 
-        public override string ToString()
+        public bool Equals(LuaCustomClrObject other)
         {
-            return "[LuaLightUserdata]";
+            return other != null && other.ClrObject == ClrObject;
         }
 
-        new public LuaWeakReference<LuaLightUserdata> CreateWeakReference()
+        internal override object BackingCustomObject
         {
-            CheckDisposed();
-
-            return Runtime.CreateWeakReference(this);
+            get { return ClrObject; }
         }
     }
 }
