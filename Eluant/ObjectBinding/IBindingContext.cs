@@ -1,5 +1,5 @@
 //
-// LuaLightUserdata.cs
+// IBindingContext.cs
 //
 // Author:
 //       Chris Howie <me@chrishowie.com>
@@ -26,33 +26,12 @@
 
 using System;
 
-namespace Eluant
+namespace Eluant.ObjectBinding
 {
-    public class LuaLightUserdata : LuaReference
+    public interface IBindingContext
     {
-        internal LuaLightUserdata(LuaRuntime runtime, int reference) : base(runtime, reference) { }
-
-        public override bool ToBoolean()
-        {
-            return true;
-        }
-
-        public override double? ToNumber()
-        {
-            return null;
-        }
-
-        public override string ToString()
-        {
-            return "[LuaLightUserdata]";
-        }
-
-        new public LuaWeakReference<LuaLightUserdata> CreateWeakReference()
-        {
-            CheckDisposed();
-
-            return Runtime.CreateWeakReference(this);
-        }
+        IBindingSecurityPolicy BindingSecurityPolicy { get; }
+        ILuaBinder Binder { get; }
     }
 }
 

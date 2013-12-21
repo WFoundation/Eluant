@@ -1,5 +1,5 @@
 //
-// LuaOpaqueClrObjectReference.cs
+// IClrObject.cs
 //
 // Author:
 //       Chris Howie <me@chrishowie.com>
@@ -25,60 +25,55 @@
 // THE SOFTWARE.
 
 using System;
+using Eluant.ObjectBinding;
 
 namespace Eluant
 {
-    public sealed class LuaOpaqueClrObjectReference : LuaLightUserdata
+    public interface IClrObject
     {
-        public LuaOpaqueClrObjectReference(LuaRuntime runtime, int reference) : base(runtime, reference) { }
+        object ClrObject { get; }
+    }
 
-        public override bool ToBoolean()
+    public static class ClrObject
+    {
+        public static bool TryGetClrObject(this IClrObject self, out object obj)
         {
-            return ClrObject != null;
-        }
-
-        public override double? ToNumber()
-        {
-            return null;
-        }
-
-        public override string ToString()
-        {
-            return "[LuaOpaqueClrObjectReference]";
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            base.Dispose(disposing);
-
-            cachedClrObject = null;
-        }
-
-        private bool isClrObjectCached = false;
-        private object cachedClrObject = null;
-
-        public object ClrObject
-        {
-            get {
-                CheckDisposed();
-
-                if (!isClrObjectCached) {
-                    Runtime.Push(this);
-                    cachedClrObject = Runtime.GetOpaqueClrObject(-1);
-                    LuaApi.lua_pop(Runtime.LuaState, 1);
-
-                    isClrObjectCached = true;
-                }
-
-                return cachedClrObject;
+            if (self != null) {
+                obj = self.ClrObject;
+                return true;
             }
+
+            obj = null;
+            return false;
         }
 
-        new public LuaWeakReference<LuaOpaqueClrObjectReference> CreateWeakReference()
+        public static object GetClrObject(this IClrObject self)
         {
-            CheckDisposed();
+            if (self == null) { throw new ArgumentNullException("self"); }
 
-            return Runtime.CreateWeakReference(this);
+            return self.ClrObject;
+        }
+
+        public static bool TryGetClrObject(this LuaValue self, out object obj)
+        {
+            var clrObject = self as IClrObject;
+            if (clrObject != null) {
+                obj = GetClrObject(clrObject);
+                return true;
+            }
+
+            obj = null;
+            return false;
+        }
+
+        public static object GetClrObject(this LuaValue self)
+        {
+            object obj;
+            if (!TryGetClrObject(self, out obj)) {
+                throw new ArgumentException("Does not represent a CLR object.", "self");
+            }
+
+            return obj;
         }
     }
 }

@@ -28,7 +28,19 @@ using System;
 
 namespace Eluant
 {
-    public sealed class LuaString : LuaValueType,
+	#if USE_KOPILUA
+	using LuaApi = KopiLuaWrapper;
+	using LuaApi_CFunction = KopiLua.LuaNativeFunction;
+	using LuaApi_LuaType = LuaNative.LuaType;
+	using LuaApi_LuaState = KopiLua.LuaState;
+	#else
+	using LuaApi = LuaNative;
+	using LuaApi_CFunction = Eluant.LuaNative.lua_CFunction;
+	using LuaApi_LuaType = LuaNative.LuaType;
+	using LuaApi_LuaState = IntPtr;
+	#endif
+
+	public sealed class LuaString : LuaValueType,
         IEquatable<LuaString>, IEquatable<string>,
         IComparable, IComparable<LuaString>, IComparable<string>
     {
@@ -59,6 +71,15 @@ namespace Eluant
         public override string ToString()
         {
             return Value;
+        }
+
+        internal override object ToClrType(Type type)
+        {
+            if (type == typeof(string)) {
+                return Value;
+            }
+
+            return base.ToClrType(type);
         }
 
         public override bool Equals(LuaValue other)

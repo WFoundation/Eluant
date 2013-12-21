@@ -28,6 +28,18 @@ using System;
 
 namespace Eluant
 {
+	#if USE_KOPILUA
+	using LuaApi = KopiLuaWrapper;
+	using LuaApi_CFunction = KopiLua.LuaNativeFunction;
+	using LuaApi_LuaType = LuaNative.LuaType;
+	using LuaApi_LuaState = KopiLua.LuaState;
+	#else
+	using LuaApi = LuaNative;
+	using LuaApi_CFunction = Eluant.LuaNative.lua_CFunction;
+	using LuaApi_LuaType = LuaNative.LuaType;
+	using LuaApi_LuaState = IntPtr;
+	#endif
+
     public sealed class LuaBoolean : LuaValueType, IEquatable<LuaBoolean>, IEquatable<bool>
     {
         private static readonly LuaBoolean falseBoolean = new LuaBoolean(false);
@@ -102,6 +114,15 @@ namespace Eluant
         public override string ToString()
         {
             return Value ? "true" : "false";
+        }
+
+        internal override object ToClrType(Type type)
+        {
+            if (type == typeof(bool)) {
+                return Value;
+            }
+
+            return base.ToClrType(type);
         }
 
         public static implicit operator LuaBoolean(bool v)

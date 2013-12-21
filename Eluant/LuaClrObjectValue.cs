@@ -1,5 +1,5 @@
 //
-// LuaLightUserdata.cs
+// LuaClrObjectValue.cs
 //
 // Author:
 //       Chris Howie <me@chrishowie.com>
@@ -28,13 +28,18 @@ using System;
 
 namespace Eluant
 {
-    public class LuaLightUserdata : LuaReference
+    public abstract class LuaClrObjectValue : LuaValueType, IClrObject
     {
-        internal LuaLightUserdata(LuaRuntime runtime, int reference) : base(runtime, reference) { }
+        public object ClrObject { get; private set; }
+
+        public LuaClrObjectValue(object obj)
+        {
+            ClrObject = obj;
+        }
 
         public override bool ToBoolean()
         {
-            return true;
+            return ClrObject != null;
         }
 
         public override double? ToNumber()
@@ -44,14 +49,26 @@ namespace Eluant
 
         public override string ToString()
         {
-            return "[LuaLightUserdata]";
+            return string.Format("[{0}: ClrObject={1}]", GetType().Name, ClrObject);
         }
 
-        new public LuaWeakReference<LuaLightUserdata> CreateWeakReference()
-        {
-            CheckDisposed();
+        internal abstract object BackingCustomObject { get; }
 
-            return Runtime.CreateWeakReference(this);
+        internal override object ToClrType(Type type)
+        {
+            if (type == null) { throw new ArgumentNullException("type"); }
+
+            if (ClrObject == null) {
+                if (!type.IsValueType || (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))) {
+                    return null;
+                }
+            } else {
+                if (type.IsAssignableFrom(ClrObject.GetType())) {
+                    return ClrObject;
+                }
+            }
+
+            return base.ToClrType(type);
         }
     }
 }

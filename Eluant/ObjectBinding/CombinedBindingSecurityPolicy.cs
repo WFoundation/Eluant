@@ -1,5 +1,5 @@
 //
-// LuaLightUserdata.cs
+// CombinedBindingSecurityPolicy.cs
 //
 // Author:
 //       Chris Howie <me@chrishowie.com>
@@ -25,34 +25,38 @@
 // THE SOFTWARE.
 
 using System;
+using System.Reflection;
 
-namespace Eluant
+namespace Eluant.ObjectBinding
 {
-    public class LuaLightUserdata : LuaReference
+    public class CombinedBindingSecurityPolicy : IBindingSecurityPolicy
     {
-        internal LuaLightUserdata(LuaRuntime runtime, int reference) : base(runtime, reference) { }
+        public IBindingSecurityPolicy FirstPolicy { get; private set; }
+        public IBindingSecurityPolicy SecondPolicy { get; private set; }
 
-        public override bool ToBoolean()
+        public CombinedBindingSecurityPolicy(IBindingSecurityPolicy first, IBindingSecurityPolicy second)
         {
-            return true;
+            if (first == null) { throw new ArgumentNullException("first"); }
+            if (second == null) { throw new ArgumentNullException("second"); }
+
+            FirstPolicy = first;
+            SecondPolicy = second;
         }
 
-        public override double? ToNumber()
+        #region IBindingSecurityPolicy implementation
+
+        public MemberSecurityPolicy GetMemberSecurityPolicy(MemberInfo member)
         {
-            return null;
+            var first = FirstPolicy.GetMemberSecurityPolicy(member);
+
+            if (first == MemberSecurityPolicy.Unspecified) {
+                return SecondPolicy.GetMemberSecurityPolicy(member);
+            }
+
+            return first;
         }
 
-        public override string ToString()
-        {
-            return "[LuaLightUserdata]";
-        }
-
-        new public LuaWeakReference<LuaLightUserdata> CreateWeakReference()
-        {
-            CheckDisposed();
-
-            return Runtime.CreateWeakReference(this);
-        }
+        #endregion
     }
 }
 
