@@ -25,14 +25,6 @@
 // THE SOFTWARE.
 //
 
-//
-// For MONOTOUCH insert in the main project as arguments the following line:
-//
-//   -cxx -gcc_flags "-L${ProjectDir} -llua5.1 -framework CFNetwork -force_load ${ProjectDir}/Libs/iOS/liblua5.1.a"
-//
-// to include the Lua library.
-//
-
 using System;
 using System.Collections.Generic;
 using System.Threading;
