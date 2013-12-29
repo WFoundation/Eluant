@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>10.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{5913825E-0C80-4660-81B3-C2C55B35ADB6}</ProjectGuid>
+    <ProjectTypeGuids>{EFBA0AD7-5A72-4C68-AF49-83D382785DCF};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Eluant.Android</RootNamespace>
+    <MonoAndroidAssetsPrefix>Assets</MonoAndroidAssetsPrefix>
+    <AndroidUseLatestPlatformSdk>False</AndroidUseLatestPlatformSdk>
+    <MonoAndroidResourcePrefix>Resources</MonoAndroidResourcePrefix>
+    <AndroidResgenFile>Resources\Resource.designer.cs</AndroidResgenFile>
+    <AndroidResgenClass>Resource</AndroidResgenClass>
+    <AssemblyName>Eluant.Android</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;__MOBILE__;__ANDROID__;MONODROID</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AndroidLinkMode>None</AndroidLinkMode>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>full</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <DefineConstants>__MOBILE__;__ANDROID__;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AndroidUseSharedRuntime>false</AndroidUseSharedRuntime>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="Mono.Android" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Resources\Resource.designer.cs" />
+    <Compile Include="IClrObject.cs" />
+    <Compile Include="LuaBoolean.cs" />
+    <Compile Include="LuaClrObjectReference.cs" />
+    <Compile Include="LuaClrObjectValue.cs" />
+    <Compile Include="LuaCustomClrObject.cs" />
+    <Compile Include="LuaException.cs" />
+    <Compile Include="LuaFunction.cs" />
+    <Compile Include="LuaGlobalsTable.cs" />
+    <Compile Include="LuaLightUserdata.cs" />
+    <Compile Include="LuaNative.cs" />
+    <Compile Include="LuaNil.cs" />
+    <Compile Include="LuaNumber.cs" />
+    <Compile Include="LuaNumberOperators.cs" />
+    <Compile Include="LuaOpaqueClrObject.cs" />
+    <Compile Include="LuaReference.cs" />
+    <Compile Include="LuaRuntime.cs" />
+    <Compile Include="LuaString.cs" />
+    <Compile Include="LuaTable.cs" />
+    <Compile Include="LuaThread.cs" />
+    <Compile Include="LuaTransparentClrObject.cs" />
+    <Compile Include="LuaUserdata.cs" />
+    <Compile Include="LuaValue.cs" />
+    <Compile Include="LuaValueExtensions.cs" />
+    <Compile Include="LuaValueType.cs" />
+    <Compile Include="LuaVararg.cs" />
+    <Compile Include="LuaWeakReference.cs" />
+    <Compile Include="MemoryConstrainedLuaRuntime.cs" />
+    <Compile Include="Scripts.cs" />
+    <Compile Include="ObjectBinding\BasicBindingSecurityPolicy.cs" />
+    <Compile Include="ObjectBinding\BasicLuaBinder.cs" />
+    <Compile Include="ObjectBinding\Bindings.cs" />
+    <Compile Include="ObjectBinding\CombinedBindingSecurityPolicy.cs" />
+    <Compile Include="ObjectBinding\IBindingContext.cs" />
+    <Compile Include="ObjectBinding\IBindingSecurityPolicy.cs" />
+    <Compile Include="ObjectBinding\ILuaBinder.cs" />
+    <Compile Include="ObjectBinding\LuaMemberAttribute.cs" />
+    <Compile Include="ObjectBinding\MemberSecurityPolicy.cs" />
+    <Compile Include="ObjectBinding\MetamethodAttribute.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\AboutResources.txt" />
+    <None Include="BindingSupport.lua" />
+    <None Include="LuaNumberOperators.tt" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\values\Strings.xml" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />
+  <ItemGroup>
+    <Folder Include="ObjectBinding\" />
+  </ItemGroup>
+</Project>
