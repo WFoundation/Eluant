@@ -2,8 +2,6 @@
 // KopiLuaWrapper.cs
 //
 // Authors:
-//       Chris Howie <me@chrishowie.com>
-//       Dirk Weltz <web@weltz-online.de>
 //       Brice Clocher <contact@cybisoft.net>
 //
 // Copyright (c) 2013 Chris Howie
@@ -31,7 +29,9 @@ using KopiLua;
 
 namespace Eluant
 {
-    internal static class KopiLuaWrapper
+	using lua_CFunction = LuaNativeFunction;
+	
+	internal static class KopiLuaWrapper
     {
         public static int LUA_REGISTRYINDEX { get { return KopiLua.Lua.LUA_REGISTRYINDEX; } }
 
@@ -168,7 +168,7 @@ namespace Eluant
         {
             CharPtr cp = Lua.LuaToString(state, idx);
 
-            return cp == null ? null : cp.ToString();
+            return cp == null ? null : cp.ToString(cp.chars.Length - 1);
         }
 
         internal static int lua_gettop(KopiLua.LuaState state)
@@ -240,5 +240,15 @@ namespace Eluant
         {
             Lua.LuaPushNumber(state, n);
         }
-    }
+
+		internal static int luaL_loadstring(LuaState state, string str)
+		{
+			return Lua.LuaLLoadString(state, str);
+		}
+
+		internal static void lua_pushlstring(LuaState state, string str, int len)
+		{
+			Lua.LuaNetPushLString(state, str, (uint)len);
+		}
+	}
 }

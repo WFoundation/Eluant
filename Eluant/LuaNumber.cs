@@ -25,6 +25,9 @@
 // THE SOFTWARE.
 
 using System;
+#if WINDOWS_PHONE
+using System.Globalization;
+#endif
 
 namespace Eluant
 {
@@ -79,7 +82,11 @@ namespace Eluant
             if (type == null) { throw new ArgumentNullException("type"); }
 
             try {
-                return Convert.ChangeType(Value, type);
+                return Convert.ChangeType(Value, type
+#if WINDOWS_PHONE
+, CultureInfo.CurrentCulture
+#endif
+					);
             } catch { }
 
             return base.ToClrType(type);

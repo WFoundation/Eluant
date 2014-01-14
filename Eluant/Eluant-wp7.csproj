@@ -50,7 +50,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="IClrObject.cs" />
     <Compile Include="KopiLuaWrapper.cs" />
+    <Compile Include="LuaClrObjectReference.cs" />
+    <Compile Include="LuaClrObjectValue.cs" />
+    <Compile Include="LuaCustomClrObject.cs" />
     <Compile Include="LuaNative.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -63,18 +67,28 @@
     <Compile Include="LuaNumber.cs" />
     <Compile Include="LuaNumberOperators.cs" />
     <Compile Include="LuaOpaqueClrObject.cs" />
-    <Compile Include="LuaOpaqueClrObjectReference.cs" />
     <Compile Include="LuaReference.cs" />
     <Compile Include="LuaRuntime.cs" />
     <Compile Include="LuaString.cs" />
     <Compile Include="LuaTable.cs" />
     <Compile Include="LuaThread.cs" />
+    <Compile Include="LuaTransparentClrObject.cs" />
     <Compile Include="LuaUserdata.cs" />
     <Compile Include="LuaValue.cs" />
     <Compile Include="LuaValueExtensions.cs" />
     <Compile Include="LuaValueType.cs" />
     <Compile Include="LuaVararg.cs" />
     <Compile Include="LuaWeakReference.cs" />
+    <Compile Include="ObjectBinding\BasicBindingSecurityPolicy.cs" />
+    <Compile Include="ObjectBinding\BasicLuaBinder.cs" />
+    <Compile Include="ObjectBinding\Bindings.cs" />
+    <Compile Include="ObjectBinding\CombinedBindingSecurityPolicy.cs" />
+    <Compile Include="ObjectBinding\IBindingContext.cs" />
+    <Compile Include="ObjectBinding\IBindingSecurityPolicy.cs" />
+    <Compile Include="ObjectBinding\ILuaBinder.cs" />
+    <Compile Include="ObjectBinding\LuaMemberAttribute.cs" />
+    <Compile Include="ObjectBinding\MemberSecurityPolicy.cs" />
+    <Compile Include="ObjectBinding\MetamethodAttribute.cs" />
     <Compile Include="Scripts.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -85,9 +99,9 @@
       <Project>{330E0C63-4160-46E0-BBDA-325185A4AB7A}</Project>
       <Name>KopiLua-wp7</Name>
     </ProjectReference>
-    <ProjectReference Include="..\MonoClassLibraries\mcs-wp7.csproj">
+    <ProjectReference Include="..\MonoClassLibraries\MonoClassLibraries-wp7.csproj">
       <Project>{515D8F8A-3EC7-4259-BACE-654B6306B273}</Project>
-      <Name>mcs-wp7</Name>
+      <Name>MonoClassLibraries-wp7</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.$(TargetFrameworkProfile).Overrides.targets" />

@@ -29,17 +29,11 @@ using System.Text;
 
 namespace Eluant
 {
-	#if USE_KOPILUA
+#if USE_KOPILUA
 	using LuaApi = KopiLuaWrapper;
-	using LuaApi_CFunction = KopiLua.LuaNativeFunction;
-	using LuaApi_LuaType = LuaNative.LuaType;
-	using LuaApi_LuaState = KopiLua.LuaState;
-	#else
+#else
 	using LuaApi = LuaNative;
-	using LuaApi_CFunction = Eluant.LuaNative.lua_CFunction;
-	using LuaApi_LuaType = LuaNative.LuaType;
-	using LuaApi_LuaState = IntPtr;
-	#endif
+#endif
 
 	public sealed class LuaString : LuaValueType,
         IEquatable<LuaString>, IEquatable<string>,
@@ -91,7 +85,13 @@ namespace Eluant
         internal override void Push(LuaRuntime runtime)
         {
 			// DW: Inserted at 06.01.2014, because of string length problems of strings with umlaute
-			LuaApi.lua_pushlstring(runtime.LuaState, Value, new UIntPtr((ulong)Encoding.UTF8.GetByteCount(Value)));
+			LuaApi.lua_pushlstring(runtime.LuaState, Value, 
+#if WINDOWS_PHONE
+				Encoding.UTF8.GetByteCount(Value)
+#else
+				new UIntPtr((ulong)Encoding.UTF8.GetByteCount(Value))
+#endif
+				);
         }
 
         public static implicit operator LuaString(string v)

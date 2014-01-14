@@ -237,7 +237,7 @@ namespace Eluant
             Runtime.Push(key);
 
             LuaApi.lua_gettable(Runtime.LuaState, -2);
-            if (LuaApi.lua_type(Runtime.LuaState, -1) != LuaApi.LuaType.Nil) {
+            if (LuaApi.lua_type(Runtime.LuaState, -1) != LuaApi_LuaType.Nil) {
                 // Slot is occupied.
                 LuaApi.lua_pop(Runtime.LuaState, 2);
 
