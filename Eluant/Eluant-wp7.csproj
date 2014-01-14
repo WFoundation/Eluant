@@ -95,7 +95,7 @@
     <EmbeddedResource Include="BindingSupport.lua" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\NLua\NLua\Core\KopiLua\KopiLua\KopiLua-wp7.csproj">
+    <ProjectReference Include="..\..\..\..\NLua\KopiLua\KopiLua\KopiLua-wp7.csproj">
       <Project>{330E0C63-4160-46E0-BBDA-325185A4AB7A}</Project>
       <Name>KopiLua-wp7</Name>
     </ProjectReference>
