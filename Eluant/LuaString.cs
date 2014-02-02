@@ -87,7 +87,8 @@ namespace Eluant
 			// DW: Inserted at 06.01.2014, because of string length problems of strings with umlaute
 			LuaApi.lua_pushlstring(runtime.LuaState, Value, 
 #if WINDOWS_PHONE
-				Encoding.UTF8.GetByteCount(Value)
+				//Encoding.UTF8.GetByteCount(Value)
+				Value.Length
 #else
 				new UIntPtr((ulong)Encoding.UTF8.GetByteCount(Value))
 #endif

@@ -30,6 +30,7 @@ using KopiLua;
 namespace Eluant
 {
 	using lua_CFunction = LuaNativeFunction;
+	using System.Text;
 	
 	internal static class KopiLuaWrapper
     {
@@ -168,7 +169,24 @@ namespace Eluant
         {
             CharPtr cp = Lua.LuaToString(state, idx);
 
-            return cp == null ? null : cp.ToString(cp.chars.Length - 1);
+			if (cp == null)
+			{
+				return null;
+			}
+
+			// Returns the string as it is if it's a binary chunk.
+			if (cp.ToString().StartsWith(Lua.LUA_SIGNATURE))
+			{
+				return cp.ToString(cp.chars.Length - 1);
+			}
+
+			// Decodes the string using UTF-8 if it's not a binary chunk.
+			byte[] bytes = new byte[cp.chars.Length];
+			for (int i = 0; i < cp.chars.Length; i++)
+			{
+				bytes[i] = (byte)cp.chars[i];
+			}
+			return Encoding.UTF8.GetString(bytes, 0, bytes.Length - 1);
         }
 
         internal static int lua_gettop(KopiLua.LuaState state)
