@@ -45,7 +45,33 @@ namespace Eluant
 
 	public class LuaTable : LuaReference, IDictionary<LuaValue, LuaValue>
     {
-        internal LuaTable(LuaRuntime runtime, int reference) : base(runtime, reference)
+		public LuaTable Metatable
+		{
+			get
+			{
+				CheckDisposed();
+
+				var top = LuaApi.lua_gettop(Runtime.LuaState);
+
+				Runtime.Push(this);
+				LuaApi.lua_getmetatable(Runtime.LuaState, -1);
+
+				LuaValue val;
+
+				try
+				{
+					val = Runtime.Wrap(-1);
+				}
+				finally
+				{
+					LuaApi.lua_settop(Runtime.LuaState, top);
+				}
+
+				return val as LuaTable;
+			}
+		}
+		
+		internal LuaTable(LuaRuntime runtime, int reference) : base(runtime, reference)
         {
             Keys = new KeyCollection(this);
             Values = new ValueCollection(this);
