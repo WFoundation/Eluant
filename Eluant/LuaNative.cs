@@ -63,7 +63,7 @@ namespace Eluant
 
 #if !USE_KOPILUA
 
-	#if MONOTOUCH
+	#if __IOS__
 		const string LUA_DLL = "__Internal";
 	#else
         const string LUA_DLL = "lua5.1.dll";
