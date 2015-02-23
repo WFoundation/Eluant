@@ -41,10 +41,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="KopiLua-wp7, Version=1.3.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\wp7\KopiLua-wp7.dll</HintPath>
-    </Reference>
     <Reference Include="System.Windows" />
     <Reference Include="system" />
     <Reference Include="System.Core" />
@@ -99,6 +95,10 @@
     <EmbeddedResource Include="BindingSupport.lua" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\NLua\KopiLua\KopiLua\KopiLua-wp7.csproj">
+      <Project>{330E0C63-4160-46E0-BBDA-325185A4AB7A}</Project>
+      <Name>KopiLua-wp7</Name>
+    </ProjectReference>
     <ProjectReference Include="..\MonoClassLibraries\MonoClassLibraries-wp7.csproj">
       <Project>{515D8F8A-3EC7-4259-BACE-654B6306B273}</Project>
       <Name>MonoClassLibraries-wp7</Name>
