@@ -82,6 +82,7 @@
     <Compile Include="LuaTransparentClrObject.cs" />
     <Compile Include="LuaCustomClrObject.cs" />
     <Compile Include="iOS\AssemblyInfo.cs" />
+    <Compile Include="ByteArrayEqualityComparer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="LuaNumberOperators.tt" />

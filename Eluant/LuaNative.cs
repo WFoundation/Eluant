@@ -180,7 +180,24 @@ namespace Eluant
 		public static extern void lua_pushlightuserdata(IntPtr L, IntPtr p);
 
 		[DllImport(LUA_DLL, CallingConvention = CallingConvention.Cdecl, EntryPoint = "lua_pushlstring")]
-		public static extern void lua_pushlstring(IntPtr L, [MarshalAs(UnmanagedType.LPStr)] string s, UIntPtr len);
+		public static extern void lua_pushlstring(IntPtr L, byte[] s, UIntPtr len);
+
+		public static void lua_pushlstring(IntPtr L, string s, int len)
+		{
+			if (s == null) {
+				lua_pushnil(L);
+			} else {
+				var ulen = new UIntPtr(checked((ulong)len));
+
+				var buffer = new byte[len];
+
+				for (int i = 0; i < s.Length; ++i) {
+					buffer[i] = unchecked((byte)s[i]);
+					}
+
+				lua_pushlstring(L, buffer, ulen);
+				}
+			}
 
 		public static void lua_pushstring(IntPtr L, string s)
 		{
@@ -190,7 +207,7 @@ namespace Eluant
 			}
 			else
 			{
-				lua_pushlstring(L, s, new UIntPtr(unchecked((ulong)s.Length)));
+				lua_pushlstring(L, s, s.Length);
 			}
 		}
 
@@ -268,7 +285,7 @@ namespace Eluant
 		[DllImport(LUA_DLL, CallingConvention = CallingConvention.Cdecl, EntryPoint = "lua_tolstring")]
 		public static extern IntPtr lua_tolstring(IntPtr L, int index, ref UIntPtr len);
 
-		public static string lua_tostring(IntPtr L, int index)
+		public static byte[] lua_tostring(IntPtr L, int index)
 		{
 			UIntPtr len = UIntPtr.Zero;
 
@@ -278,21 +295,17 @@ namespace Eluant
 				return null;
 			}
 
-			int length = checked((int)len.ToUInt32 ());
-			// Changed, because the function fails, if the result is a binary chunk
-			byte [] buff = new byte [length];
-			Marshal.Copy (stringPtr, buff, 0, length);
-			// Are the first four bytes "ESC Lua". If yes, than it is a binary chunk.
-			// Didn't check on version of Lua, because it isn't relevant.
-			if (length > 3 && buff [0] == 0x1B && buff [1] == 0x4C && buff [2] == 0x75 && buff [3] == 0x61) {
-				// It is a binary chunk
-				StringBuilder s = new StringBuilder (length);
-				foreach (byte b in buff)
-					s.Append ((char)b);
-				return s.ToString ();
-			} else {
-				return Marshal.PtrToStringAnsi (stringPtr, length);
-			}
+			var len32 = checked((int)len.ToUInt32());
+
+			if (len32 == 0) {
+				return new byte[0];
+				}
+
+			var buffer = new byte[len32];
+
+			Marshal.Copy(stringPtr, buffer, 0, len32);
+
+			return buffer;
 		}
 
 		[DllImport(LUA_DLL, CallingConvention = CallingConvention.Cdecl, EntryPoint = "lua_tothread")]

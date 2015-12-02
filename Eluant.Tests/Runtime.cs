@@ -90,7 +90,41 @@ namespace Eluant.Tests
             }
         }
 
-        [Test]
+		[Test]
+		public void NonAsciiStringMarshallingFromLua()
+		{
+			using (var runtime = new LuaRuntime()) {
+				runtime.DoString(@"k = string.char(0xFC, 0xFF)").Dispose();
+
+				LuaString clrString;
+				using (var k = runtime.Globals["k"]) {
+					clrString = (LuaString)k;
+					}
+
+				Assert.AreEqual(2, clrString.AsByteArray().Length, "clrString.AsByteArray().Length");
+
+				runtime.Globals["kclr"] = clrString;
+
+				runtime.DoString("assert(k == kclr, 'k == kclr')").Dispose();
+				}
+			}
+
+		[Test]
+		public void NonAsciiStringMarshallingFromCLR()
+		{
+			var str = "a\u1234b";
+
+			Assert.AreEqual(3, str.Length, "str.Length");
+
+			using (var runtime = new LuaRuntime()) {
+				runtime.Globals["s"] = str;
+
+				Assert.AreEqual(str, runtime.Globals["s"].ToString(), "str == s");
+				}
+			}
+
+
+		[Test]
         public void Finalizer()
         {
             var finalized = false;
