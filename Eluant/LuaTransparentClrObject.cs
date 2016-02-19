@@ -25,10 +25,10 @@
 // THE SOFTWARE.
 
 using System;
+using System.Reflection;
 using Eluant.ObjectBinding;
 using System.Linq;
 using System.Collections.Generic;
-using System.Reflection;
 
 namespace Eluant
 {
@@ -155,7 +155,7 @@ namespace Eluant
 
                         var property = members[0] as PropertyInfo;
                         if (property != null) {
-                            var getter = property.GetGetMethod();
+                            var getter = property.GetMethod;
                             if (getter == null) {
                                 throw new LuaException("Property is write-only.");
                             }
@@ -180,7 +180,7 @@ namespace Eluant
                     if (members.Count == 1) {
                         var property = members[0] as PropertyInfo;
                         if (property != null) {
-                            var setter = property.GetSetMethod();
+                            var setter = property.SetMethod;
                             if (setter == null) {
                                 throw new LuaException("Property is read-only.");
                             }

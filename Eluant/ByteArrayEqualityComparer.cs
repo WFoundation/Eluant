@@ -1,10 +1,10 @@
-//
-// BasicBindingSecurityPolicy.cs
+﻿//
+// ByteArrayEqualityComparer.cs
 //
 // Author:
 //       Chris Howie <me@chrishowie.com>
 //
-// Copyright (c) 2013 Chris Howie
+// Copyright (c) 2015 Chris Howie
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,34 +23,52 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-
 using System;
-using System.Reflection;
+using System.Collections.Generic;
 using System.Linq;
 
-namespace Eluant.ObjectBinding
+namespace Eluant
 {
-    public class BasicBindingSecurityPolicy : IBindingSecurityPolicy
+    internal class ByteArrayEqualityComparer : IEqualityComparer<byte[]>
     {
-        public MemberSecurityPolicy DefaultPolicy { get; private set; }
+        public static readonly ByteArrayEqualityComparer Instance = new ByteArrayEqualityComparer();
 
-        public BasicBindingSecurityPolicy(MemberSecurityPolicy policy)
+        public ByteArrayEqualityComparer() { }
+
+        #region IEqualityComparer implementation
+
+        public bool Equals(byte[] x, byte[] y)
         {
-            DefaultPolicy = policy;
-        }
-
-        #region IBindingSecurityPolicy implementation
-
-        public virtual MemberSecurityPolicy GetMemberSecurityPolicy(MemberInfo member)
-        {
-            if (member.GetCustomAttributes(typeof(LuaMemberAttribute), true).Count() != 0) {
-                return MemberSecurityPolicy.Permit;
+            if (x == null)
+            {
+                return y == null;
             }
 
-            return DefaultPolicy;
+            if (y == null || x.Length != y.Length)
+            {
+                return false;
+            }
+
+            return x.SequenceEqual(y);
+        }
+
+        public int GetHashCode(byte[] obj)
+        {
+            if (obj == null)
+            {
+                throw new ArgumentNullException("obj");
+            }
+
+            int code = 0;
+
+            foreach (byte b in obj)
+            {
+                code = (code >> 29) | (code << 3) ^ b;
+            }
+
+            return code;
         }
 
         #endregion
     }
 }
-

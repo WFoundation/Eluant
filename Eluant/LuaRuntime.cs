@@ -503,7 +503,7 @@ namespace Eluant
                     return (LuaNumber)LuaApi.lua_tonumber(LuaState, index);
 
                 case LuaApi_LuaType.String:
-                    return (LuaString)LuaApi.lua_tostring(LuaState, index);
+                    return new LuaString(LuaApi.lua_tostring(LuaState, index));
 
                 case LuaApi_LuaType.Table:
                     return new LuaTable(this, CreateReference(index));
@@ -575,7 +575,7 @@ namespace Eluant
         private void LoadString(string str)
         {
             if (LuaApi.luaL_loadstring(LuaState, str) != 0) {
-                var error = LuaApi.lua_tostring(LuaState, -1);
+                var error = new LuaString(LuaApi.lua_tostring(LuaState, -1));
                 LuaApi.lua_pop(LuaState, 1);
 
                 throw new LuaException(error);
@@ -613,7 +613,7 @@ namespace Eluant
 		{
 			if (LuaApi.luaL_loadbuffer(LuaState, str, str.Length, name) != 0)
 			{
-				var error = LuaApi.lua_tostring(LuaState, -1);
+				var error = new LuaString(LuaApi.lua_tostring(LuaState, -1));
 
 				LuaApi.lua_pop(LuaState, 1);
 
@@ -625,7 +625,7 @@ namespace Eluant
 		{
 			if (LuaApi.luaL_loadbuffer(LuaState, bytes, bytes.Length, name) != 0)
 			{
-				var error = LuaApi.lua_tostring(LuaState, -1);
+				var error = new LuaString(LuaApi.lua_tostring(LuaState, -1));
 				LuaApi.lua_pop(LuaState, 1);
 
 				throw new LuaException(error);
@@ -732,7 +732,7 @@ namespace Eluant
                     OnEnterClr();
 
                     // Finally block will take care of popping the error message.
-                    throw new LuaException(LuaApi.lua_tostring(LuaState, -1));
+                    throw new LuaException(new LuaString(LuaApi.lua_tostring(LuaState, -1)));
                 }
                 needEnterClr = false;
                 OnEnterClr();
@@ -904,11 +904,11 @@ namespace Eluant
                 LuaApi.lua_settable(LuaState, -3);
 
                 // For all others, we use MetamethodAttribute on the interface to make this code less repetitive.
-                var metamethods = obj.BackingCustomObject.GetType().GetInterfaces()
-                    .SelectMany(iface => iface.GetCustomAttributes(typeof(MetamethodAttribute), false).Cast<MetamethodAttribute>());
+                var metamethods = obj.BackingCustomObject.GetType().GetTypeInfo().ImplementedInterfaces
+                    .SelectMany(iface => iface.GetTypeInfo().GetCustomAttributes(typeof(MetamethodAttribute), false).Cast<MetamethodAttribute>());
 
                 foreach (var metamethod in metamethods) {
-                    LuaApi.lua_pushstring(LuaState, metamethod.MethodName);
+                    new LuaString(metamethod.MethodName).Push(this);
                     Push(metamethodCallbacks[metamethod.MethodName]);
                     LuaApi.lua_settable(LuaState, -3);
                 }
@@ -1252,13 +1252,13 @@ namespace Eluant
                 LuaApi.lua_settop(state, oldTop);
 
                 LuaApi.lua_pushboolean(LuaState, 0);
-                LuaApi.lua_pushstring(LuaState, ex.Message);
+                new LuaString(ex.Message).Push(this);
                 return 2;
             } catch (Exception ex) {
                 LuaApi.lua_settop(state, oldTop);
 
                 LuaApi.lua_pushboolean(state, 0);
-                LuaApi.lua_pushstring(state, "Uncaught CLR exception at Lua->CLR boundary: " + ex.ToString());
+                new LuaString("Uncaught CLR exception at Lua->CLR boundary: " + ex.ToString()).Push(this);
                 return 2;
             } finally {
                 try {
@@ -1327,7 +1327,7 @@ namespace Eluant
                                 // Omitted/nil argument.
                                 if (parms[i].IsOptional) {
                                     args[i] = parms[i].DefaultValue;
-                                } else if (!ptype.IsValueType || (ptype.IsGenericType && ptype.GetGenericTypeDefinition() == typeof(Nullable<>))) {
+                                } else if (!ptype.GetTypeInfo().IsValueType || (ptype.GetTypeInfo().IsGenericType && ptype.GetGenericTypeDefinition() == typeof(Nullable<>))) {
                                     args[i] = null;
                                 } else {
                                     throw new LuaException(string.Format("Argument {0} is not optional.", i + 1));
@@ -1336,7 +1336,7 @@ namespace Eluant
 
                             case LuaApi_LuaType.Boolean:
                                 // Bool means bool.
-                                if (!ptype.IsAssignableFrom(typeof(bool))) {
+                                if (!ptype.GetTypeInfo().IsAssignableFrom(typeof(bool).GetTypeInfo())) {
                                     throw new LuaException(string.Format("Argument {0}: Cannot be bool.", i + 1));
                                 }
 
@@ -1344,7 +1344,7 @@ namespace Eluant
                                 break;
 
                             case LuaApi_LuaType.Function:
-                                if (!ptype.IsAssignableFrom(typeof(LuaFunction))) {
+                                if (!ptype.GetTypeInfo().IsAssignableFrom(typeof(LuaFunction).GetTypeInfo())) {
                                     throw new LuaException(string.Format("Argument {0}: Cannot be a function.", i + 1));
                                 }
 
@@ -1353,7 +1353,7 @@ namespace Eluant
                                 break;
 
                             case LuaApi_LuaType.LightUserdata:
-                                if (ptype.IsAssignableFrom(typeof(LuaLightUserdata))) {
+                                if (ptype.GetTypeInfo().IsAssignableFrom(typeof(LuaLightUserdata).GetTypeInfo())) {
                                     args[i] = wrapped = Wrap(i + 1);
                                     toDispose.Add(wrapped);
                                 } else {
@@ -1374,15 +1374,15 @@ namespace Eluant
                                 break;
 
                             case LuaApi_LuaType.String:
-                                if (!ptype.IsAssignableFrom(typeof(string))) {
+                                if (!ptype.GetTypeInfo().IsAssignableFrom(typeof(string).GetTypeInfo())) {
                                     throw new LuaException(string.Format("Argument {0}: Cannot be a string.", i + 1));
                                 }
 
-                                args[i] = LuaApi.lua_tostring(state, i + 1);
+                                args[i] = new LuaString(LuaApi.lua_tostring(state, i + 1)).Value;
                                 break;
 
                             case LuaApi_LuaType.Table:
-                                if (!ptype.IsAssignableFrom(typeof(LuaTable))) {
+                                if (!ptype.GetTypeInfo().IsAssignableFrom(typeof(LuaTable).GetTypeInfo())) {
                                     throw new LuaException(string.Format("Argument {0}: Cannot be a table.", i + 1));
                                 }
 
@@ -1391,7 +1391,7 @@ namespace Eluant
                                 break;
 
                             case LuaApi_LuaType.Thread:
-                                if (!ptype.IsAssignableFrom(typeof(LuaThread))) {
+                                if (!ptype.GetTypeInfo().IsAssignableFrom(typeof(LuaThread).GetTypeInfo())) {
                                     throw new LuaException(string.Format("Argument {0}: Cannot be a thread.", i + 1));
                                 }
 
@@ -1410,7 +1410,7 @@ namespace Eluant
                                 LuaClrObjectValue clrObject;
                                 if ((clrObject = TryGetClrObject<LuaClrObjectValue>(i + 1)) != null) {
                                     args[i] = clrObject.ClrObject;
-                                } else if (ptype.IsAssignableFrom(typeof(LuaUserdata))) {
+                                } else if (ptype.GetTypeInfo().IsAssignableFrom(typeof(LuaUserdata).GetTypeInfo())) {
                                     args[i] = wrapped = Wrap(i + 1);
                                     toDispose.Add(wrapped);
                                 } else {
@@ -1488,11 +1488,11 @@ namespace Eluant
                 return 2;
             } catch (LuaException ex) {
                 LuaApi.lua_pushboolean(state, 0);
-                LuaApi.lua_pushstring(state, ex.Message);
+                new LuaString(ex.Message).Push(this);
                 return 2;
             } catch (Exception ex) {
                 LuaApi.lua_pushboolean(state, 0);
-                LuaApi.lua_pushstring(state, "Uncaught CLR exception at Lua->CLR boundary: " + ex.ToString());
+                new LuaString("Uncaught CLR exception at Lua->CLR boundary: " + ex.ToString()).Push(this);
                 return 2;
             } finally {
                 // Dispose whatever we need to.  It's okay to dispose result objects, as that will only release the CLR
@@ -1707,7 +1707,7 @@ namespace Eluant
                 if (d == null) { throw new ArgumentNullException("d"); }
 
                 Target = d.Target;
-                Method = d.Method;
+                Method = d.GetMethodInfo();
             }
 
             public object Invoke(params object[] parms)

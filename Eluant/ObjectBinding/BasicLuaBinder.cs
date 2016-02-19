@@ -53,7 +53,7 @@ namespace Eluant.ObjectBinding
         {
             var membersByName = new MemberNameMap();
 
-            foreach (var member in type.GetMembers(BindingFlags.Public | BindingFlags.Instance)) {
+            foreach (var member in type.GetTypeInfo().DeclaredMembers) {
                 var method = member as MethodInfo;
                 if (method != null && method.IsGenericMethodDefinition) {
                     continue;
@@ -75,7 +75,7 @@ namespace Eluant.ObjectBinding
             return membersByName;
         }
 
-        #region ILuaBinder implementation
+#region ILuaBinder implementation
 
         public virtual ICollection<MemberInfo> GetMembersByName(object targetObject, string memberName)
         {
@@ -112,7 +112,7 @@ namespace Eluant.ObjectBinding
                 new LuaTransparentClrObject(obj, bindingContext.Binder, bindingContext.BindingSecurityPolicy);
         }
 
-        #endregion
+#endregion
     }
 }
 

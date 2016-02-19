@@ -25,6 +25,7 @@
 // THE SOFTWARE.
 
 using System;
+using System.Reflection;
 
 namespace Eluant
 {
@@ -80,7 +81,8 @@ namespace Eluant
         {
             if (type == null) { throw new ArgumentNullException("type"); }
 
-            if (!type.IsValueType || (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))) {
+            if (!type.GetTypeInfo().IsValueType || (type.GetTypeInfo().IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>)))
+            {
                 return null;
             }
 

@@ -25,6 +25,7 @@
 // THE SOFTWARE.
 
 using System;
+using System.Reflection;
 
 namespace Eluant
 {
@@ -59,11 +60,11 @@ namespace Eluant
             if (type == null) { throw new ArgumentNullException("type"); }
 
             if (ClrObject == null) {
-                if (!type.IsValueType || (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))) {
+                if (!type.GetTypeInfo().IsValueType || (type.GetTypeInfo().IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))) {
                     return null;
                 }
             } else {
-                if (type.IsAssignableFrom(ClrObject.GetType())) {
+                if (type.GetTypeInfo().IsAssignableFrom(ClrObject.GetType().GetTypeInfo())) {
                     return ClrObject;
                 }
             }

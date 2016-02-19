@@ -26,6 +26,7 @@
 
 using System;
 using System.Text;
+using System.Collections;
 
 namespace Eluant
 {
@@ -39,13 +40,49 @@ namespace Eluant
         IEquatable<LuaString>, IEquatable<string>,
         IComparable, IComparable<LuaString>, IComparable<string>
     {
-        public string Value { get; private set; }
+        private string stringValue;
+        private byte[] byteValue;
+
+        public string Value
+        {
+            get {
+                if (stringValue == null) {
+                    if (byteValue.Length > 3 && byteValue[0] == 0x1B && byteValue[1] == 0x4C && byteValue[2] == 0x75 && byteValue[3] == 0x61)
+                    {
+                        // It is a binary chunk
+                        StringBuilder s = new StringBuilder(byteValue.Length);
+                        foreach (byte b in byteValue)
+                            s.Append((char)b);
+                        stringValue = s.ToString();
+                    }
+                    else
+                    {
+                        stringValue = Encoding.UTF8.GetString(byteValue, 0, byteValue.Length);
+                    }
+                }
+
+                return stringValue;
+            }
+        }
 
         public LuaString(string value)
         {
             if (value == null) { throw new ArgumentNullException("value"); }
 
-            Value = value;
+            stringValue = value;
+            byteValue = Encoding.UTF8.GetBytes(value);
+        }
+
+        public LuaString(byte[] value)
+        {
+            if (value == null) { throw new ArgumentNullException("value"); }
+
+            byteValue = (byte[])value.Clone();
+        }
+
+        public byte[] AsByteArray()
+        {
+            return (byte[])byteValue.Clone();
         }
 
         public override bool ToBoolean()
@@ -74,6 +111,11 @@ namespace Eluant
                 return Value;
             }
 
+            if (type == typeof(byte[]))
+            {
+                return AsByteArray();
+            }
+
             return base.ToClrType(type);
         }
 
@@ -84,13 +126,13 @@ namespace Eluant
 
         internal override void Push(LuaRuntime runtime)
         {
-			// DW: Inserted at 06.01.2014, because of string length problems of strings with umlaute
-			LuaApi.lua_pushlstring(runtime.LuaState, Value, 
+            // DW: Inserted at 06.01.2014, because of string length problems of strings with umlaute
+            LuaApi.lua_pushlstring(runtime.LuaState, byteValue,
 #if WINDOWS_PHONE
 				//Encoding.UTF8.GetByteCount(Value)
-				Value.Length
+				byteValue.Length
 #else
-				new UIntPtr((ulong)Encoding.UTF8.GetByteCount(Value))
+            new UIntPtr(checked((uint)byteValue.Length))
 #endif
 				);
         }
@@ -105,9 +147,16 @@ namespace Eluant
             return object.ReferenceEquals(s, null) ? null : s.Value;
         }
 
+        private int? hashCode = null;
+
         public override int GetHashCode()
         {
-            return Value.GetHashCode();
+            if (!hashCode.HasValue)
+            {
+                hashCode = ByteArrayEqualityComparer.Instance.GetHashCode(byteValue);
+            }
+            
+            return hashCode.Value;
         }
 
         public override bool Equals(object obj)
@@ -120,7 +169,7 @@ namespace Eluant
             if (object.ReferenceEquals(obj, this)) { return true; }
             if (object.ReferenceEquals(obj, null)) { return false; }
 
-            return obj.Value == Value;
+            return ByteArrayEqualityComparer.Instance.Equals(byteValue, obj.byteValue);
         }
 
         public bool Equals(string obj)
@@ -132,25 +181,25 @@ namespace Eluant
 
         // No (LuaString, LuaString) overload.  With implicit conversion to string, that creates ambiguity.
 
-        public static bool operator==(LuaString a, string b)
+        public static bool operator==(LuaString a, LuaString b)
         {
-            return (string)a == b;
+            if (object.ReferenceEquals(a, null))
+            {
+                return object.ReferenceEquals(b, null);
+            }
+            
+            if (object.ReferenceEquals(b, null))
+            {
+                return false;
+            }
+            
+            return a.Equals(b);
         }
 
-        public static bool operator!=(LuaString a, string b)
+        public static bool operator!=(LuaString a, LuaString b)
         {
             return !(a == b);
         }
-
-//        public static bool operator==(string a, LuaString b)
-//        {
-//            return a == (string)b;
-//        }
-//
-//        public static bool operator!=(string a, LuaString b)
-//        {
-//            return !(a == b);
-//        }
 
         public int CompareTo(LuaString s)
         {
