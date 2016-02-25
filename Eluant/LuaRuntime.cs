@@ -1067,7 +1067,7 @@ namespace Eluant
         }
 
 #if (__IOS__)
-        [ObjCRuntime.MonoPInvokeCallback(typeof(LuaApi.lua_CFunction))]
+//        [ObjCRuntime.MonoPInvokeCallback(typeof(LuaApi.lua_CFunction))]
 #endif
 		private static int ClrObjectGcCallbackWrapper(LuaApi_LuaState state)
         {
@@ -1151,7 +1151,7 @@ namespace Eluant
         }
 
 #if (__IOS__)
-        [ObjCRuntime.MonoPInvokeCallback(typeof(LuaApi.lua_CFunction))]
+//        [ObjCRuntime.MonoPInvokeCallback(typeof(LuaApi.lua_CFunction))]
 #endif
 		private static int MethodWrapperCallCallbackWrapper(LuaApi_LuaState state)
         {

@@ -90,7 +90,7 @@ namespace Eluant
         // Note that we can never fail when newSize < oldSize; Lua makes the assumption that failure is not possible in
         // that case.
 #if (__IOS__)
-        [ObjCRuntime.MonoPInvokeCallback(typeof(LuaAllocator))]
+//        [ObjCRuntime.MonoPInvokeCallback(typeof(LuaAllocator))]
 #endif
         private static IntPtr Allocate(IntPtr userData, IntPtr ptr, IntPtr oldSize, IntPtr newSize)
         {

@@ -35,7 +35,7 @@ namespace Eluant
     {
         private static string GetResource(string file)
         {
-            using (var s = new StreamReader(typeof(Scripts).GetTypeInfo().Assembly.GetManifestResourceStream("Eluant." + file), Encoding.UTF8)) {
+            using (var s = new StreamReader(typeof(Scripts).GetTypeInfo().Assembly.GetManifestResourceStream("Eluant" + file), Encoding.UTF8)) {
                 return s.ReadToEnd();
             }
         }
