@@ -69,6 +69,15 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugWP8|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\DebugWP8\</OutputPath>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
     <!-- A reference to the entire .NET Framework is automatically included -->
     <None Include="BindingSupport.lua" />
@@ -84,7 +93,6 @@
     <Compile Include="LuaException.cs" />
     <Compile Include="LuaFunction.cs" />
     <Compile Include="LuaGlobalsTable.cs" />
-    <Compile Include="LuaLib.cs" />
     <Compile Include="LuaLightUserdata.cs" />
     <Compile Include="LuaNative.cs" />
     <Compile Include="LuaNil.cs" />
