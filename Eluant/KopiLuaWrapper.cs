@@ -264,25 +264,16 @@ namespace Eluant
 			return Lua.LuaLLoadString(state, str);
 		}
 
-		internal static void lua_pushlstring(LuaState state, string str, int len)
+		internal static void lua_pushlstring(LuaState state, byte[] str, int len)
 		{
-            // Encodes the string to UTF-8 if it's not a binary chunk.
-            string strval = str;
-            int lenval = len;
-            if (!str.StartsWith(Lua.LUA_SIGNATURE))
+            // Makes a string out of the byte array.
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < len; i++)
             {
-                // Gets the UTF-8 bytes for the requested substring.
-                byte[] utfBytes = new byte[Encoding.UTF8.GetByteCount(str)];
-                lenval = Encoding.UTF8.GetBytes(str, 0, len, utfBytes, 0);
-                
-                // Builds a string with each byte as a char.
-                StringBuilder sb = new StringBuilder();
-                for (int i = 0; i < lenval; i++)
-                {
-                    sb.Append((char)utfBytes[i]);
-                }
-                strval = sb.ToString();
+                sb.Append((char)str[i]);
             }
+            string strval = sb.ToString();
+            int lenval = sb.Length;
 
             // Pushes the string.
             Lua.LuaNetPushLString(state, strval, (uint)lenval);

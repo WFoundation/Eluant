@@ -50,6 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="ByteArrayEqualityComparer.cs" />
     <Compile Include="IClrObject.cs" />
     <Compile Include="KopiLuaWrapper.cs" />
     <Compile Include="LuaClrObjectReference.cs" />

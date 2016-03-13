@@ -57,7 +57,7 @@ namespace Eluant
 					}
 					else
 					{
-						stringValue = Encoding.UTF8.GetString(byteValue);
+						stringValue = Encoding.UTF8.GetString(byteValue, 0, byteValue.Length);
 					}
 				}
 
