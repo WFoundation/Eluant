@@ -40,15 +40,11 @@ using System.Globalization;
 namespace Eluant
 {
 #if USE_KOPILUA
-	using LuaApi = KopiLuaWrapper;
-	using LuaApi_CFunction = KopiLua.LuaNativeFunction;
-	using LuaApi_LuaState = KopiLua.LuaState;
-	using LuaApi_LuaType = LuaNative.LuaType;
+    using LuaApi_CFunction = KopiLua.LuaNativeFunction;
+    using LuaApi_LuaState = KopiLua.LuaState;
 #else
-	using LuaApi = LuaNative;
-	using LuaApi_CFunction = Eluant.LuaNative.lua_CFunction;
-	using LuaApi_LuaState = IntPtr;
-	using LuaApi_LuaType = LuaNative.LuaType;
+    using LuaApi_CFunction = LuaApi.lua_CFunction;
+    using LuaApi_LuaState = IntPtr;
 #endif
 
 	public class LuaRuntime : IDisposable
@@ -428,7 +424,7 @@ namespace Eluant
                 LuaApi.lua_pop(LuaState, 1);
 
                 // If the entry at that slot was nil, it's a valid open slot.
-				if (type == LuaApi_LuaType.Nil){
+				if (type == LuaApi.LuaType.Nil){
                     lastReference = reference;
 
                     return reference;
@@ -490,38 +486,38 @@ namespace Eluant
 
         internal LuaValue Wrap(int index)
         {
-			LuaApi_LuaType type = LuaApi.lua_type(LuaState, index);
+			LuaApi.LuaType type = LuaApi.lua_type(LuaState, index);
 
             switch (type) {
-                case LuaApi_LuaType.Nil:
+                case LuaApi.LuaType.Nil:
                     return LuaNil.Instance;
 
-                case LuaApi_LuaType.Boolean:
+                case LuaApi.LuaType.Boolean:
                     return (LuaBoolean)(LuaApi.lua_toboolean(LuaState, index) != 0);
 
-                case LuaApi_LuaType.Number:
+                case LuaApi.LuaType.Number:
                     return (LuaNumber)LuaApi.lua_tonumber(LuaState, index);
 
-                case LuaApi_LuaType.String:
+                case LuaApi.LuaType.String:
 					return new LuaString(LuaApi.lua_tostring(LuaState, index));
 
-                case LuaApi_LuaType.Table:
+                case LuaApi.LuaType.Table:
                     return new LuaTable(this, CreateReference(index));
 
-                case LuaApi_LuaType.Function:
+                case LuaApi.LuaType.Function:
                     return new LuaFunction(this, CreateReference(index));
 
-                case LuaApi_LuaType.LightUserdata:
+                case LuaApi.LuaType.LightUserdata:
                     return new LuaLightUserdata(this, CreateReference(index));
 
-                case LuaApi_LuaType.Userdata:
+                case LuaApi.LuaType.Userdata:
                     if (IsClrObject(index)) {
                         return new LuaClrObjectReference(this, CreateReference(index));
                     }
 
                     return new LuaUserdata(this, CreateReference(index));
 
-                case LuaApi_LuaType.Thread:
+                case LuaApi.LuaType.Thread:
                     return new LuaThread(this, CreateReference(index));
             }
 
@@ -812,9 +808,9 @@ namespace Eluant
             // here, so we check to make absolutely sure that the Lua value represents one of our CLR object types.
 			if (LuaApi.lua_type(LuaState, index) == 
 #if WINDOWS_PHONE
-			LuaApi_LuaType.Number
+			LuaApi.LuaType.Number
 #else
-			LuaApi_LuaType.Userdata
+			LuaApi.LuaType.Userdata
 #endif
 			) {
                 if (IsClrObject(index)) {
@@ -1319,11 +1315,11 @@ namespace Eluant
                     for (int i = 0; i < parms.Length; ++i) {
                         var ptype = parms[i].ParameterType;
 
-                        var luaType = i >= nargs ? LuaApi_LuaType.None : LuaApi.lua_type(state, i + 1);
+                        var luaType = i >= nargs ? LuaApi.LuaType.None : LuaApi.lua_type(state, i + 1);
 
                         switch (luaType) {
-                            case LuaApi_LuaType.None:
-                            case LuaApi_LuaType.Nil:
+                            case LuaApi.LuaType.None:
+                            case LuaApi.LuaType.Nil:
                                 // Omitted/nil argument.
                                 if (parms[i].IsOptional) {
                                     args[i] = parms[i].DefaultValue;
@@ -1334,7 +1330,7 @@ namespace Eluant
                                 }
                                 break;
 
-                            case LuaApi_LuaType.Boolean:
+                            case LuaApi.LuaType.Boolean:
                                 // Bool means bool.
                                 if (!ptype.IsAssignableFrom(typeof(bool))) {
                                     throw new LuaException(string.Format("Argument {0}: Cannot be bool.", i + 1));
@@ -1343,7 +1339,7 @@ namespace Eluant
                                 args[i] = LuaApi.lua_toboolean(state, i + 1) != 0;
                                 break;
 
-                            case LuaApi_LuaType.Function:
+                            case LuaApi.LuaType.Function:
                                 if (!ptype.IsAssignableFrom(typeof(LuaFunction))) {
                                     throw new LuaException(string.Format("Argument {0}: Cannot be a function.", i + 1));
                                 }
@@ -1352,7 +1348,7 @@ namespace Eluant
                                 toDispose.Add(wrapped);
                                 break;
 
-                            case LuaApi_LuaType.LightUserdata:
+                            case LuaApi.LuaType.LightUserdata:
                                 if (ptype.IsAssignableFrom(typeof(LuaLightUserdata))) {
                                     args[i] = wrapped = Wrap(i + 1);
                                     toDispose.Add(wrapped);
@@ -1361,7 +1357,7 @@ namespace Eluant
                                 }
                                 break;
 
-                            case LuaApi_LuaType.Number:
+                            case LuaApi.LuaType.Number:
                                 try {
                                     args[i] = Convert.ChangeType(LuaApi.lua_tonumber(state, i + 1), ptype
 #if WINDOWS_PHONE
@@ -1373,7 +1369,7 @@ namespace Eluant
                                 }
                                 break;
 
-                            case LuaApi_LuaType.String:
+                            case LuaApi.LuaType.String:
                                 if (!ptype.IsAssignableFrom(typeof(string))) {
                                     throw new LuaException(string.Format("Argument {0}: Cannot be a string.", i + 1));
                                 }
@@ -1381,7 +1377,7 @@ namespace Eluant
 								args[i] = new LuaString(LuaApi.lua_tostring(state, i + 1)).Value;
                                 break;
 
-                            case LuaApi_LuaType.Table:
+                            case LuaApi.LuaType.Table:
                                 if (!ptype.IsAssignableFrom(typeof(LuaTable))) {
                                     throw new LuaException(string.Format("Argument {0}: Cannot be a table.", i + 1));
                                 }
@@ -1390,7 +1386,7 @@ namespace Eluant
                                 toDispose.Add(wrapped);
                                 break;
 
-                            case LuaApi_LuaType.Thread:
+                            case LuaApi.LuaType.Thread:
                                 if (!ptype.IsAssignableFrom(typeof(LuaThread))) {
                                     throw new LuaException(string.Format("Argument {0}: Cannot be a thread.", i + 1));
                                 }
@@ -1399,7 +1395,7 @@ namespace Eluant
                                 toDispose.Add(wrapped);
                                 break;
 
-                            case LuaApi_LuaType.Userdata:
+                            case LuaApi.LuaType.Userdata:
                                 // With CLR objects, we have ambiguity.  We could test if the parameter type is
                                 // compatible with LuaUserdata first, and if so wrap the Lua object.  But, perhaps the
                                 // opaque object IS a LuaUserdata instance?  There's really no way to be smart in that

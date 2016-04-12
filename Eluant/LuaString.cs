@@ -30,12 +30,6 @@ using System.Collections;
 
 namespace Eluant
 {
-#if USE_KOPILUA
-	using LuaApi = KopiLuaWrapper;
-#else
-	using LuaApi = LuaNative;
-#endif
-
 	public sealed class LuaString : LuaValueType,
         IEquatable<LuaString>, IEquatable<string>,
         IComparable, IComparable<LuaString>, IComparable<string>

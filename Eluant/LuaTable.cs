@@ -31,18 +31,6 @@ using System.Linq;
 
 namespace Eluant
 {
-	#if USE_KOPILUA
-	using LuaApi = KopiLuaWrapper;
-	using LuaApi_CFunction = KopiLua.LuaNativeFunction;
-	using LuaApi_LuaType = LuaNative.LuaType;
-	using LuaApi_LuaState = KopiLua.LuaState;
-	#else
-	using LuaApi = LuaNative;
-	using LuaApi_CFunction = Eluant.LuaNative.lua_CFunction;
-	using LuaApi_LuaType = LuaNative.LuaType;
-	using LuaApi_LuaState = IntPtr;
-	#endif
-
 	public class LuaTable : LuaReference, IDictionary<LuaValue, LuaValue>
     {
 		public LuaTable Metatable
@@ -263,7 +251,7 @@ namespace Eluant
             Runtime.Push(key);
 
             LuaApi.lua_gettable(Runtime.LuaState, -2);
-            if (LuaApi.lua_type(Runtime.LuaState, -1) != LuaApi_LuaType.Nil) {
+            if (LuaApi.lua_type(Runtime.LuaState, -1) != LuaApi.LuaType.Nil) {
                 // Slot is occupied.
                 LuaApi.lua_pop(Runtime.LuaState, 2);
 
