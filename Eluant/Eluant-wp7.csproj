@@ -52,13 +52,10 @@
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="ByteArrayEqualityComparer.cs" />
     <Compile Include="IClrObject.cs" />
-    <Compile Include="KopiLuaWrapper.cs" />
+    <Compile Include="LuaApi.cs" />
     <Compile Include="LuaClrObjectReference.cs" />
     <Compile Include="LuaClrObjectValue.cs" />
     <Compile Include="LuaCustomClrObject.cs" />
-    <Compile Include="LuaNative.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="LuaBoolean.cs" />
     <Compile Include="LuaException.cs" />
     <Compile Include="LuaFunction.cs" />
