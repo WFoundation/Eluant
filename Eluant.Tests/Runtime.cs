@@ -83,7 +83,7 @@ namespace Eluant.Tests
 
                     Assert.AreEqual("bar", t1["foo"].ToString());
                     Assert.AreEqual(6, t2[5].ToNumber());
-                    using (var clrRef = (LuaOpaqueClrObjectReference)t2["fixture"]) {
+                    using (var clrRef = (LuaClrObjectReference)t2["fixture"]) {
                         Assert.AreSame(this, clrRef.ClrObject);
                     }
                 }

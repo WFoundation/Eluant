@@ -6,3 +6,4 @@ obj
 *.swp
 *.user
 test-results
+.vs/

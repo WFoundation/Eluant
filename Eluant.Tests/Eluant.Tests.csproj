@@ -1,54 +1,33 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>10.0.0</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{F1850D5C-48D6-4D42-AC85-072E706030BF}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <RootNamespace>Eluant.Tests</RootNamespace>
-    <AssemblyName>Eluant.Tests</AssemblyName>
-    <UseMSBuildEngine>False</UseMSBuildEngine>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug</OutputPath>
-    <DefineConstants>DEBUG;</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <ConsolePause>false</ConsolePause>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>none</DebugType>
+    <TargetFramework>net461</TargetFramework>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release</OutputPath>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <ConsolePause>false</ConsolePause>
+    <LangVersion>5</LangVersion>
+    <DebugSymbols>true</DebugSymbols>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <OutputPath></OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+     <Configurations>Release;Debug;</Configurations>
+     <RunAnalyzersDuringBuild>false</RunAnalyzersDuringBuild>
+     <AnalysisLevel>none</AnalysisLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="nunit.framework, Version=2.6.0.12051, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77">
-      <Private>False</Private>
-    </Reference>
+    <!-- Work around an issue where Rider does not detect files in the project root using the default glob -->
+    <Compile Include="**/*.cs" Exclude="$(DefaultItemExcludes)" />
   </ItemGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
+    <PackageReference Include="NUnit" Version="2.6.0.12054" />
+  </ItemGroup>
+    <ItemGroup>
     <ProjectReference Include="..\Eluant\Eluant.csproj">
-      <Project>{D4CFD952-4EDC-421D-84A5-998688815124}</Project>
-      <Name>Eluant</Name>
+      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Types.cs" />
-    <Compile Include="Functions.cs" />
-    <Compile Include="Performance.cs" />
-    <Compile Include="MemoryConstraint.cs" />
-    <Compile Include="Runtime.cs" />
-    <Compile Include="Tables.cs" />
-  </ItemGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <Optimize>false</Optimize>
+  </PropertyGroup>
 </Project>
