@@ -33,7 +33,7 @@ using System.Collections.Concurrent;
 using System.Runtime.InteropServices;
 using Eluant.ObjectBinding;
 using System.Linq;
-#if WINDOWS_PHONE
+#if NO_MARSHALLING
 using System.Globalization;
 #endif
 
@@ -54,7 +54,7 @@ namespace Eluant
 		private static readonly LuaApi_CFunction clrObjectGcCallbackWrapper;
 		private static readonly LuaApi_CFunction methodWrapperCallCallbackWrapper;
 
-#if WINDOWS_PHONE
+#if NO_MARSHALLING
 		// On Silverlight for Windows Phone, there is no support for Marshaling.
 		// Because of this, the static callback system of LuaRuntime does not work
 		// out of the box, because instances of LuaRuntime cannot be retrieved
@@ -73,21 +73,23 @@ namespace Eluant
             methodWrapperCallCallbackWrapper = MethodWrapperCallCallbackWrapper;
         }
 
-#if !WINDOWS_PHONE
+#if !NO_MARSHALLING
 		[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 #endif
 		protected internal delegate LuaApi_LuaState LuaAllocator(IntPtr ud, IntPtr ptr, IntPtr osize, IntPtr nsize);
 		protected internal LuaApi_LuaState LuaState { get; private set; }
 
-        // A self-referential weak handle used by the static callback methods to locate the LuaRuntime instance.
-        private GCHandle selfHandle;
+#if !NO_MARSHALLING
+		// A self-referential weak handle used by the static callback methods to locate the LuaRuntime instance.
+		private GCHandle selfHandle;
 
-        protected GCHandle SelfHandle
-        {
-            get { return selfHandle; }
-        }
+		protected GCHandle SelfHandle
+		{
+			get { return selfHandle; }
+		} 
+#endif
 
-#if WINDOWS_PHONE
+#if NO_MARSHALLING
 		// A reference of this instance in the static runtime reference manager.
 		// See private static ObjectReferenceManager<LuaRuntime> runtimeReferenceManager.
 		private int selfReference;
@@ -97,9 +99,11 @@ namespace Eluant
 
         // Separate field for the corner case where customAllocator was collected first.
         private bool hasCustomAllocator = false;
-        private LuaAllocator customAllocator;
+#if !NO_MARSHALLING
+		private LuaAllocator customAllocator; 
+#endif
 
-        private const string MAIN_THREAD_KEY = "eluant_main_thread";
+		private const string MAIN_THREAD_KEY = "eluant_main_thread";
         private const string REFERENCES_KEY = "eluant_references";
 
         private const string WEAKREFERENCE_METATABLE = "eluant_weakreference";
@@ -115,7 +119,7 @@ namespace Eluant
         {
             try {
 
-#if WINDOWS_PHONE
+#if NO_MARSHALLING
 				lock (syncRoot)
 				{
 					selfReference = runtimeReferenceManager.CreateReference(this); 
@@ -124,7 +128,7 @@ namespace Eluant
 				selfHandle = GCHandle.Alloc(this, GCHandleType.WeakTrackResurrection);
 #endif
 
-#if !WINDOWS_PHONE
+#if !NO_MARSHALLING
                 LuaApi_LuaState customState;
                 customAllocator = CreateAllocatorDelegate(out customState);
 
@@ -136,7 +140,7 @@ namespace Eluant
 #endif
 					hasCustomAllocator = false;
                     LuaState = LuaApi.luaL_newstate();
-#if !WINDOWS_PHONE
+#if !NO_MARSHALLING
                 }
 #endif
 
@@ -201,7 +205,7 @@ namespace Eluant
 
 		protected void PushSelf()
 		{
-#if WINDOWS_PHONE
+#if NO_MARSHALLING
 			// No support of Marshaling on WP: we're pushing a statically tracked
 			// reference to this instance instead.
 			int selfRef = 0;
@@ -218,7 +222,7 @@ namespace Eluant
 
 		protected static LuaRuntime GetSelf(LuaApi_LuaState state, int index)
 		{
-#if WINDOWS_PHONE
+#if NO_MARSHALLING
 			// No support of Marshaling on WP: we're getting a statically tracked
 			// reference to the instance instead.
 			int selfRef = (int)LuaApi.lua_tonumber(state, index);
@@ -333,7 +337,7 @@ namespace Eluant
                 }
             }
 
-#if WINDOWS_PHONE
+#if NO_MARSHALLING
 			lock (syncRoot)
 			{
 				if (selfReference != 0)
@@ -778,7 +782,7 @@ namespace Eluant
 
 		private void PushNewReferenceValue(int reference)
 		{
-#if WINDOWS_PHONE
+#if NO_MARSHALLING
 			LuaApi.lua_pushnumber(LuaState, (double)reference);
 #else
 			var userData = LuaApi.lua_newuserdata(LuaState, (UIntPtr)Marshal.SizeOf(typeof(IntPtr)));
@@ -807,14 +811,14 @@ namespace Eluant
             // Make sure this Lua value represents a CLR object.  There are security implications if things go wrong
             // here, so we check to make absolutely sure that the Lua value represents one of our CLR object types.
 			if (LuaApi.lua_type(LuaState, index) == 
-#if WINDOWS_PHONE
+#if NO_MARSHALLING
 			LuaApi.LuaType.Number
 #else
 			LuaApi.LuaType.Userdata
 #endif
 			) {
                 if (IsClrObject(index)) {
-#if WINDOWS_PHONE
+#if NO_MARSHALLING
 					return (int)LuaApi.lua_tonumber(LuaState, index);
 #else 
 					var userData = LuaApi.lua_touserdata(LuaState, index);
@@ -916,7 +920,7 @@ namespace Eluant
             }
         }
 
-#if !WINDOWS_PHONE
+#if !NO_MARSHALLING
 		private int NewindexCallback(LuaApi_LuaState state)
         {
             return LuaToClrBoundary(state, toDispose => {
@@ -1360,7 +1364,7 @@ namespace Eluant
                             case LuaApi.LuaType.Number:
                                 try {
                                     args[i] = Convert.ChangeType(LuaApi.lua_tonumber(state, i + 1), ptype
-#if WINDOWS_PHONE
+#if NO_MARSHALLING
 , CultureInfo.CurrentCulture
 #endif
 										);
@@ -1530,7 +1534,7 @@ namespace Eluant
 
             try {
                 return (LuaNumber)(double)Convert.ChangeType(obj, typeof(double)
-#if WINDOWS_PHONE
+#if NO_MARSHALLING
 					, CultureInfo.CurrentCulture
 #endif
 					);
@@ -1572,7 +1576,7 @@ namespace Eluant
 
 			try {
 				return (LuaNumber)(double)Convert.ChangeType(obj, typeof(double)
-#if WINDOWS_PHONE
+#if NO_MARSHALLING
 , CultureInfo.CurrentCulture
 #endif
 					);

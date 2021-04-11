@@ -1,0 +1,4 @@
+[submodule "KopiLua"]
+	path = KopiLua
+	url = https://github.com/WFoundation/KopiLua
+	branch = netstandard2.0

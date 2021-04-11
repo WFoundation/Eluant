@@ -121,7 +121,7 @@ namespace Eluant
         {
 			// DW: Inserted at 06.01.2014, because of string length problems of strings with umlaute
 			LuaApi.lua_pushlstring(runtime.LuaState, byteValue, 
-#if WINDOWS_PHONE
+#if USE_KOPILUA
 				//Encoding.UTF8.GetByteCount(Value)
 				byteValue.Length
 #else

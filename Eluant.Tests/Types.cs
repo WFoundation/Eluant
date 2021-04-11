@@ -82,7 +82,7 @@ namespace Eluant.Tests
             using (var runtime = new LuaRuntime()) {
                 runtime.Globals["o"] = new LuaOpaqueClrObject(this);
 
-                using (var o = (LuaOpaqueClrObjectReference)runtime.Globals["o"]) {
+                using (var o = (LuaClrObjectReference)runtime.Globals["o"]) {
                     Assert.AreSame(this, o.ClrObject);
                 }
             }

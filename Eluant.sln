@@ -7,6 +7,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Eluant", "Eluant\Eluant.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Eluant.Tests", "Eluant.Tests\Eluant.Tests.csproj", "{E6923BDB-1C73-45CD-8D7F-7B9A4A77F202}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Eluant-KopiLua", "Eluant\Eluant-KopiLua.csproj", "{8DE50C8C-B95E-4EF5-A369-8C3EE2F3031A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KopiLua", "KopiLua\KopiLua\KopiLua.csproj", "{0D699043-C513-43DF-8FE3-564936745873}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,14 @@ Global
 		{E6923BDB-1C73-45CD-8D7F-7B9A4A77F202}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E6923BDB-1C73-45CD-8D7F-7B9A4A77F202}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E6923BDB-1C73-45CD-8D7F-7B9A4A77F202}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8DE50C8C-B95E-4EF5-A369-8C3EE2F3031A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8DE50C8C-B95E-4EF5-A369-8C3EE2F3031A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8DE50C8C-B95E-4EF5-A369-8C3EE2F3031A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8DE50C8C-B95E-4EF5-A369-8C3EE2F3031A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0D699043-C513-43DF-8FE3-564936745873}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0D699043-C513-43DF-8FE3-564936745873}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0D699043-C513-43DF-8FE3-564936745873}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0D699043-C513-43DF-8FE3-564936745873}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
