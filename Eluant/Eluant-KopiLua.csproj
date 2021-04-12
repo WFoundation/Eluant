@@ -12,6 +12,8 @@
     <Configurations>Release;Debug;</Configurations>
     <RunAnalyzersDuringBuild>false</RunAnalyzersDuringBuild>
 	<DefineConstants>USE_KOPILUA;NO_MARSHALLING</DefineConstants>
+	<AssemblyName>Eluant</AssemblyName>
+	<RootNamespace>Eluant</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <!-- Work around an issue where Rider does not detect files in the project root using the default glob -->
